@@ -22,17 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "buttons.h"
-#include "flash.h"
-#include "lcd.h"
 
-#include "stdlib.h"
-
-#define VECT_TAB_SRAM
-
-#define WIDTH 320
-#define HEIGHT 240
-#define MAX_SPRITES 256
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,8 +52,6 @@ SPI_HandleTypeDef hspi2;
 
 /* USER CODE BEGIN PV */
 
-uint16_t audiobuffer[48000] __attribute__((section (".audio")));
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -88,177 +76,10 @@ static void MX_NVIC_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-
- struct Sprite {
-    uint16_t w, h;
-    char* data;
-};
-
-class SpriteManager {
-    Sprite* sprites[MAX_SPRITES];
-    static SpriteManager* instance;
-public:
-    static SpriteManager* GetInstance() {
-        if (instance == nullptr) {
-            instance = new SpriteManager();
-        }
-        return instance;
-    }
-    void SetSprite(uint16_t id, Sprite *sprite) {
-        sprites[id] = sprite;
-    }
-    void CreateSprite(uint16_t id, const char* data, uint16_t w, uint16_t h) {
-        sprites[id] = new Sprite{ w, h, (char*)data };
-    }
-    Sprite* GetSprite(uint16_t id) {
-        return sprites[id];
-    }
-};
-SpriteManager* SpriteManager::instance = nullptr;
-
-class Palette {
-    uint16_t* colors;
-public:
-    uint16_t GetColor(char color){
-      return colors[(color & 15)];
-    }
-    uint16_t GetUpColor(char color) {
-        return colors[(color & 240) >> 4];
-    }
-    uint16_t GetDownColor(char color) {
-        return colors[(color & 15)];
-    }
-    void SetColors(uint16_t _colors[16]) {
-        colors = _colors;
-    }
-};
-
-
-void DrawSprite(const char *sprite, Palette palette, int x, int y, int width, int height, int scale=1, bool flipX = false, bool flipY = false) {
-    int u, v;
-    uint16_t color = 0;
-    for (int j = 0; j < height; j++) {
-        for (int i = 0; i < width; i++) {
-            u = 0;
-            v = 0;
-            for (int k = 0; k < 2; k++) {
-                if ((flipX ? 1-k : k) > 0) {
-                    color = palette.GetDownColor(sprite[(flipY ? height - j - 1 : j) * width + (flipX ? width - i - 1 : i)]);
-                }
-                else {
-                    color = palette.GetUpColor(sprite[(flipY ? height - j - 1 : j) * width + (flipX ? width - i - 1 : i)]);
-                }
-                for (int b = 0; b < scale; b++) {
-                    for (int a = 0; a < scale; a++) {
-                        while ((u + ((i * 2) + k) * scale + a + x) >= WIDTH) {
-                            u -= WIDTH;
-                        }
-                        while ((u + ((i * 2) + k) * scale + a + x) < 0) {
-                            u += WIDTH;
-                        }
-                        while ((v + j*scale+b + y) >= HEIGHT) {
-                            v -= HEIGHT;
-                        }
-                        while ((v + j*scale+b + y) < 0) {
-                            v += HEIGHT;
-                        }
-
-                        framebuffer[(((y + j*scale+b + v)) * WIDTH + ((x + ((i * 2)+k)*scale+a + u)))] = color;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void Clear(uint16_t color){
-  for (int y = 0; y < HEIGHT; y++){
-    for (int x = 0; x < WIDTH; x++){
-      framebuffer[y*WIDTH+x] = palette.GetColor(color);
-    }
-  }
-}
-
-class Entity {
-protected:
-    float x = 0;
-    float y = 0;
-    bool flipX, flipY;
-    uint16_t spriteID;
-public:
-    Entity(float _x, float _y) {
-        x = _x;
-        y = _y;
-        spriteID = 0;
-        flipX = false;
-        flipY = false;
-    }
-
-    virtual void Events(u_int32_t) {
-        
-    }
-
-    virtual void Update() {
-
-    }
-
-    virtual void Draw(Palette palette) {
-        Sprite* sprite = SpriteManager::GetInstance()->GetSprite(spriteID);
-        DrawSprite(sprite->data, palette, x, y, sprite->w, sprite->h, 3, flipX, flipY);
-    }
-};
-
-class Player: public Entity {
-protected:
-    float vx = 0;
-    float vy = 0;
-    float speed = 2;
-public:
-    Player(float x, float y)
-        : Entity(x, y)
-    {
-        spriteID = 0;
-    }
-    void Events(uint32_t event) override{
-        if (event& B_Left){
-            vx = -speed;
-            vy = 0;
-        }
-        if (event& B_Right){
-            vx = speed;
-            vy = 0;
-        }
-        if (event& B_Up){
-            vy = -speed;
-            vx = 0;
-        }
-        if (event& B_Down){
-            vy = speed;
-            vx = 0;
-        }
-    }
-    
-
-    void Update() {
-        if (vx != 0 && vy != 0) {
-            vx = 0.707f * (vx / abs(vx));
-            vy = 0.707f * (vy / abs(vy));
-        }
-        if (vx < 0.0f) {
-            flipX = true;
-        }
-        else if (vx > 0.0f) {
-            flipX = false;
-        }
-
-        x += vx;
-        y += vy;
-    }
-};
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -267,6 +88,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -288,52 +110,15 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
-  lcd_init(&hspi2, &hltdc);
-  memset(framebuffer, 0xff, 320*240*2);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  flash_memory_map(&hospi1);
-
-  // Sanity check, sometimes this is triggered
-  uint32_t add = 0x90000000;
-  uint32_t* ptr = (uint32_t*)add;
-  if(*ptr == 0x88888888) {
-    Error_Handler();
-  }
-
-  Palette palette;
-  uint16_t colors[16] = {0x0000, 0xD596, 0xE1E1, 0xC041, 
-  0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-  0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-  0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
-  palette.SetColors(colors);
-
-  SpriteManager* spriteManager = SpriteManager::GetInstance();
-  spriteManager->CreateSprite(0, (char*)"\x00\x30\x00\x00\x00\x03\x33\x00\x00\x32\x33\x30\x00\x11\x23\x30\x03\x11\x21\x33\x03\x22\x22\x33\x03\x22\x22\x33\x00\x33\x33\x00", 4, 8);
-  spriteManager->CreateSprite(1, (char*)"\x30\x02\x23\x00\x30\x20\x00\x30\x03\x22\x22\x23\x02\x23\x23\x23\x03\x22\x32\x23\x03\x23\x23\x23\x03\x22\x22\x23\x03\x33\x33\x33", 4, 8);
-
-  Player player(0.0f, 0.0f);
-
-  // Create a continuous square wave and loop it using DMA in circular mode
-  /*for (uint32_t i = 0; i < sizeof(audiobuffer) / sizeof(audiobuffer[0]); i++) {
-    audiobuffer[i] = (i % (48000 / 500)) > 48 ? 200 : -200;
-  }
-  HAL_SAI_Transmit_DMA(&hsai_BlockA1, audiobuffer, sizeof(audiobuffer) / sizeof(audiobuffer[0]));*/
-
   while (1)
   {
-    uint32_t buttons = buttons_get();
+    /* USER CODE END WHILE */
 
-    player.Events(buttons);
-    player.Update();
-    
-    Clear(0);
-    player.Draw(palette);
-    
-    HAL_Delay(20);
+    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -756,13 +541,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  while(1) {
-    // Blink display to indicate failure
-    lcd_backlight_off();
-    HAL_Delay(500);
-    lcd_backlight_on();
-    HAL_Delay(500);
-  }
+
   /* USER CODE END Error_Handler_Debug */
 }
 
