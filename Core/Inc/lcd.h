@@ -1,6 +1,10 @@
 #ifndef _LCD_H_
 #define _LCD_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stm32h7xx_hal.h"
 #include <stdint.h>
 
@@ -11,4 +15,9 @@ extern uint16_t framebuffer[320 * 240]  __attribute__((section (".lcd")));
 void lcd_init(SPI_HandleTypeDef *spi, LTDC_HandleTypeDef *ltdc);
 void lcd_backlight_on();
 void lcd_backlight_off();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
