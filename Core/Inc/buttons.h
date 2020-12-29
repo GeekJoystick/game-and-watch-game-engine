@@ -1,6 +1,10 @@
 #ifndef _BUTTONS_H_
 #define _BUTTONS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define B_Left (1 << 0)
@@ -14,5 +18,9 @@
 #define B_PAUSE (1 << 8)
 
 uint32_t buttons_get();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

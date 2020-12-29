@@ -22,11 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <cstring>
+
 #include "buttons.h"
 #include "flash.h"
 #include "lcd.h"
-
-#include "stdlib.h"
 
 #define VECT_TAB_SRAM
 
@@ -171,7 +171,7 @@ void DrawSprite(const char *sprite, Palette palette, int x, int y, int width, in
     }
 }
 
-void Clear(uint16_t color){
+void Clear(uint16_t color, Palette palette){
   for (int y = 0; y < HEIGHT; y++){
     for (int x = 0; x < WIDTH; x++){
       framebuffer[y*WIDTH+x] = palette.GetColor(color);
@@ -194,7 +194,7 @@ public:
         flipY = false;
     }
 
-    virtual void Events(u_int32_t) {
+    virtual void Events(uint32_t) {
         
     }
 
@@ -330,7 +330,7 @@ int main(void)
     player.Events(buttons);
     player.Update();
     
-    Clear(0);
+    Clear(0, palette);
     player.Draw(palette);
     
     HAL_Delay(20);
