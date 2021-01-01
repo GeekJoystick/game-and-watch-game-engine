@@ -122,3 +122,5 @@ renderer->SetPalette(&palette);
 //Code to create the sprite on slot 0
 spriteManager->CreateSprite(0, "\x00\x30\x00\x00\x00\x03\x33\x00\x00\x32\x33\x30\x00\x11\x23\x30\x03\x11\x21\x33\x03\x22\x22\x33\x03\x22\x22\x33\x00\x33\x33\x00", 4, 8);
 ```
+
+*Note: Do know that sprite width must be an even number. This is because in the engine, width is divided by two, as there are two pixels per byte*
