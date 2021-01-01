@@ -90,22 +90,22 @@ For instance `0x01` decodes to the colors `0` and `1` of the palette.
 
 Knowing this we can start encoding sprites :smiley:.
 
-For instance, we want to encode this sprite:
+For instance, we want to encode this sprite:\
 ![](images/exampleSprite.png)
 
-We can take each pixel, and assign them a number based on their color.
+We can take each pixel, and assign them a number based on their color.\
 ![](images/ExampleEncoding1.gif)
 
-We can then create a palette out of all the pixels:
+We can then create a palette out of all the pixels:\
 ![](images/ExampleEncoding2.gif)
 
-And convert the palette from RGB888 to RGB565:
+And convert the palette from RGB888 to RGB565:\
 ![](images/ExampleEncoding3.gif)
 
-And we can pair the numbers together to make bytes:
+And we can pair the numbers together to make bytes:\
 ![](images/ExampleEncoding4.gif)
 
-Finally, we get this data:
+Finally, we get this data:\
 ![](images/FinalEncoding.png)
 
 And thus we finally can enter this code to create the sprite within the engine:
