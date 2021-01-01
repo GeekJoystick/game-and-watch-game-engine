@@ -18,7 +18,7 @@ public:
         : Entity(0, 0)
     {
         spriteID = 0;
-        tag = T_Player;
+        tag = "Player";
     }
     void Events(uint32_t buttons) override{
          if (buttons & B_Up){
@@ -53,8 +53,6 @@ public:
         transform.y += vy;
       }
     }
-
-
 };
 
 class Fuel : public Entity{
@@ -63,7 +61,7 @@ public:
         : Entity(0, 0)
     {
         spriteID = 1;
-        tag = T_Fuel;
+        tag = "Fuel";
     }
 
     void Update(EntityManager* entityManager) override {
@@ -72,14 +70,12 @@ public:
         for (int i = 0; i < MAX_ENTITIES; i++) {
           entity = entityManager->GetEntity(i);
           if (entity != nullptr) {
-            switch (entity->Tag()) {
-            case T_Player:
+            if (entity->Tag() == "Player"){
               Transform other = *entity->GetTransform();
               if (Math::RectCollision(transform, other)) {
                   transform.x = rand() % (int)(WIDTH - (transform.width*transform.scale));
                   transform.y = rand() % (int)(HEIGHT - (transform.height*transform.scale));
               }
-              break;
             }
           }
         }
@@ -87,10 +83,10 @@ public:
     }
 };
 
-class PutTheGuyOnFireOut: public Game{
+class PutTheGuyOnFireOut: public GameAndWatchEngine{
 public:
   PutTheGuyOnFireOut()
-  : Game()
+  : GameAndWatchEngine()
   {
     uint16_t colors[16] = {0x0000, 0xD596, 0xE1E1, 0xC041, 
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
@@ -100,8 +96,8 @@ public:
 
     renderer->SetPalette(&palette);
 
-    spriteManager->CreateSprite(0, (char*)"\x00\x30\x00\x00\x00\x03\x33\x00\x00\x32\x33\x30\x00\x11\x23\x30\x03\x11\x21\x33\x03\x22\x22\x33\x03\x22\x22\x33\x00\x33\x33\x00", 4, 8);
-    spriteManager->CreateSprite(1, (char*)"\x30\x02\x23\x00\x30\x20\x00\x30\x03\x22\x22\x23\x02\x23\x23\x23\x03\x22\x32\x23\x03\x23\x23\x23\x03\x22\x22\x23\x03\x33\x33\x33", 4, 8);
+    spriteManager->CreateSprite(0, "\x00\x30\x00\x00\x00\x03\x33\x00\x00\x32\x33\x30\x00\x11\x23\x30\x03\x11\x21\x33\x03\x22\x22\x33\x03\x22\x22\x33\x00\x33\x33\x00", 4, 8);
+    spriteManager->CreateSprite(1, "\x30\x02\x23\x00\x30\x20\x00\x30\x03\x22\x22\x23\x02\x23\x23\x23\x03\x22\x32\x23\x03\x23\x23\x23\x03\x22\x22\x23\x03\x33\x33\x33", 4, 8);
 
     entityManager->CreateEntity<Player>(0);
     entityManager->CreateEntity<Fuel>(1);

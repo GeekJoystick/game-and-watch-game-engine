@@ -58,7 +58,7 @@ static void MX_NVIC_Init(void);
 
 struct Sprite {
     uint16_t width, height;
-    char* data;
+    const char* data;
 };
 
 struct Transform {
@@ -271,7 +271,7 @@ public:
 };
 
 class SpriteManager {
-    Sprite* sprites[256];
+    Sprite* sprites[MAX_SPRITES];
     static SpriteManager* instance;
 public:
     static SpriteManager* GetInstance() {
@@ -280,10 +280,21 @@ public:
         }
         return instance;
     }
+    /** 
+     * Replaces a certain sprite slot with a given sprite
+     * @param[in] id The sprite slot to write to
+     * @param[in] sprite A pointer to the sprite we want to set
+     */
     void SetSprite(uint16_t id, Sprite *sprite) {
+        if (sprites[id] != nullptr){
+          sprites[id]->~Sprite();
+        }
         sprites[id] = sprite;
     }
     void CreateSprite(uint16_t id, const char* data, uint16_t w, uint16_t h) {
+        if (sprites[id] != nullptr){
+          sprites[id]->~Sprite();
+        }
         sprites[id] = new Sprite{ w, h, (char*)data };
     }
     Sprite* GetSprite(uint16_t id) {
@@ -296,16 +307,10 @@ class EntityManager;
 
 class Entity {
 protected:
-    enum Tags {
-        T_None,
-        T_Player,
-        T_Fuel
-    };
-
     Transform transform;
     bool flipX, flipY;
     uint16_t spriteID;
-    Tags tag = T_None;
+    const char* tag = "None";
     bool paused;
 public:
     Entity(float _x, float _y) {
@@ -321,7 +326,7 @@ public:
         return &transform;
     }
 
-    Tags Tag() {
+    const char* Tag() {
         return tag;
     }
 
@@ -472,7 +477,7 @@ public:
   }
 };
 
-class Game{
+class GameAndWatchEngine{
 protected:
   Palette palette;
   Renderer* renderer;
@@ -482,7 +487,7 @@ protected:
   bool running, paused;
 
 public:
-  Game(){
+  GameAndWatchEngine(){
     uint16_t colors[16] = {0x0000, 0xFFFF, 0xFFFF, 0xFFFF, 
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
