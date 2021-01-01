@@ -91,7 +91,7 @@ For instance `0x01` decodes to the colors `0` and `1` of the palette.
 Knowing this we can start encoding sprites :smiley:.
 
 For instance, we want to encode this sprite:\
-![](images/exampleSprite.png)
+![](images/fire.png)
 
 We can take each pixel, and assign them a number based on their color.\
 ![](images/ExampleEncoding1.gif)
