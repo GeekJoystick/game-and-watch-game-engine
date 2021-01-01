@@ -68,7 +68,7 @@ This code produces a black screen with a little fire sprite 10 pixels from the s
 
 ## Sprite structure
 
-The sprites in this game engine have a specific structure, and must be hard-coded in order to be able to be put onto the actual console. This part will describe how the sprites are structured, and the different ways you can render them.
+The sprites in this game engine have a specific structure, and must be hard-coded in order to be able to be put onto the actual console. This part will describe how the sprites are structured.
 
 First off, the game engine uses a color palette for rendering, so sprites don't have a full color range, but you can easily change the color palette during the game's execution, and the sprite require less spaces. 
 The palette can only contain 16 different colors that are in the RGB565 format. ([You can use this converter](http://drakker.org/convert_rgb565.html))
@@ -124,3 +124,26 @@ spriteManager->CreateSprite(0, "\x00\x30\x00\x00\x00\x03\x33\x00\x00\x32\x33\x30
 ```
 
 *Note: Do know that sprite width must be an even number. This is because in the engine, width is divided by two, as there are two pixels per byte*
+
+
+## Sprite Rendering
+
+Now that we covered how sprites are encoded, we will now cover how to render sprites to the screen. \
+**Do know though, that the sprite drawing is handled by default by the game engine, BUT you can override the Draw function \
+of your entities if you want more freedom with the way they're drawn.**
+Currently there's only one drawing function in the renderer: `DrawSprite()`.
+
+Here's an template call of this function:\
+```C++
+renderer->DrawSprite(sprite, x, y, scale, flipX, flipY);
+```
+
+Let's see what each parameter is for: \
+- (Sprite*) spriteSlot: This is a pointer to the sprite you want to draw in the sprite manager\
+- (int) x: This is the horizontal position of the sprite\
+- (int) y: This is the vertical position of the sprite\
+- (int) scale (default: 1): This is the scale (an integer scale)\
+- (bool) flipX (default: false): If this flag is raised, the sprite will be flipped horizontaly.\
+- (bool) flipY (default: false): Same as flipY, but vertical
+
+By the way, in order to get the sprite pointer you must use the function `spriteManager->GetSprite(spriteSlot)`.
