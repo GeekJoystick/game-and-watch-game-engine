@@ -1,0 +1,5 @@
+C_INCLUDES =  \
+-ICore/Inc \
+
+all:
+	g++ Core/Src/main.cpp -o main -lSDL2 -Wall -O2 -DDESKTOP -DCOMPILING $(C_INCLUDES)
