@@ -62,7 +62,8 @@ int main(void)
 }
 ```
 
-This code produces a black screen with a little fire sprite 10 pixels from the side and top of the screen.
+This code produces a black screen with a little fire sprite 10 pixels from the side and top of the screen:\
+![](images/Screenshot.png)
 
 *Note: There will be features such as tilemaps, and layers (I think) down the line, and as such the structure of a program will change slightly overtime*
 
