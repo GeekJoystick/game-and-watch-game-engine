@@ -136,7 +136,7 @@ Currently there's only one drawing function in the renderer: `DrawSprite()`.
 
 Here's an template call of this function:\
 ```C++
-renderer->DrawSprite(sprite, x, y, scale, flipX, flipY);
+renderer->DrawSprite(sprite, x, y, scale, flipX, flipY, transparentColor);
 ```
 
 Let's see what each parameter is for: \
@@ -146,5 +146,9 @@ Let's see what each parameter is for: \
 - (int) scale (default: 1): This is the scale (an integer scale)\
 - (bool) flipX (default: false): If this flag is raised, the sprite will be flipped horizontaly.\
 - (bool) flipY (default: false): Same as flipY, but vertical
+- (char) transparentColor (default: 0): The color that is considered as transparent
 
 By the way, in order to get the sprite pointer you must use the function `spriteManager->GetSprite(spriteSlot)`.
+
+Here's an example of the same sprite drawn with different parameters: \
+![](images/DrawingMethods.png)
