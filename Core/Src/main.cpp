@@ -20,38 +20,36 @@ public:
         spriteID = 0;
         tag = "Player";
     }
-    void Events(uint32_t buttons) override{
-         if (buttons & B_Up){
+    void Events(KeyState buttons) override{
+         if (buttons.Up){
            vy = -speed;
            vx = 0;
-         }else if (buttons & B_Down){
+         }else if (buttons.Down){
            vy = speed;
            vx = 0;
-         }else if (buttons & B_Left){
+         }else if (buttons.Left){
            vx = -speed;
            vy = 0;
-         }else if (buttons & B_Right){
+         }else if (buttons.Right){
            vx = speed;
            vy = 0;
          }
     }
 
     void Update(EntityManager* entityManager) override{
-      if (!paused){
-        if (vx != 0 && vy != 0) {
-            vx = 0.707f * (vx / abs(vx));
-            vy = 0.707f * (vy / abs(vy));
-        }
-        if (vx < 0.0f) {
-            flipX = true;
-        }
-        else if (vx > 0.0f) {
-            flipX = false;
-        }
-
-        transform.x += vx;
-        transform.y += vy;
+      if (vx != 0 && vy != 0) {
+          vx = 0.707f * (vx / abs(vx));
+          vy = 0.707f * (vy / abs(vy));
       }
+      if (vx < 0.0f) {
+          flipX = true;
+      }
+      else if (vx > 0.0f) {
+          flipX = false;
+      }
+
+      transform.x += vx;
+      transform.y += vy;
     }
 };
 
@@ -65,17 +63,15 @@ public:
     }
 
     void Update(EntityManager* entityManager) override {
-      if (!paused){
-        Entity* entity;
-        for (int i = 0; i < MAX_ENTITIES; i++) {
-          entity = entityManager->GetEntity(i);
-          if (entity != nullptr) {
-            if (entity->Tag() == "Player"){
-              Transform other = *entity->GetTransform();
-              if (Math::RectCollision(transform, other)) {
-                  transform.x = rand() % (int)(WIDTH - (transform.width*transform.scale));
-                  transform.y = rand() % (int)(HEIGHT - (transform.height*transform.scale));
-              }
+      Entity* entity;
+      for (int i = 0; i < MAX_ENTITIES; i++) {
+        entity = entityManager->GetEntity(i);
+        if (entity != nullptr) {
+          if (entity->Tag() == "Player"){
+            Transform other = *entity->GetTransform();
+            if (Math::RectCollision(transform, other)) {
+                transform.x = rand() % (int)(WIDTH - (transform.width*transform.scale));
+                transform.y = rand() % (int)(HEIGHT - (transform.height*transform.scale));
             }
           }
         }
@@ -83,10 +79,10 @@ public:
     }
 };
 
-class PutTheGuyOnFireOut: public GameAndWatchEngine{
+class PutTheGuyOnFireOut: public Engine{
 public:
   PutTheGuyOnFireOut()
-  : GameAndWatchEngine()
+  : Engine()
   {
     uint16_t colors[16] = {
     0x0000, 0xD596, 0xE1E1, 0xC041, 

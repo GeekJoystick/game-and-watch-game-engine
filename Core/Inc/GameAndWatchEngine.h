@@ -132,6 +132,92 @@ public:
     }
 };
 
+struct KeyState{
+  bool Up    = false;
+  bool Down  = false;
+  bool Left  = false;
+  bool Right = false;
+  bool A     = false;
+  bool B     = false;
+  bool Game  = false;
+  bool Time  = false;
+  bool Pause = false;
+  bool End = false;
+};
+
+class Input{
+public:
+  static KeyState GetButtons(){
+    #ifdef DESKTOP
+    SDL_Event event;
+    KeyState state;
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_WINDOWEVENT){
+        if (event.window.event == SDL_WINDOWEVENT_CLOSE){
+          state.End = true;
+        }
+      }
+      if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+        case SDLK_UP:
+          state.Up = true;
+          break;
+        case SDLK_DOWN:
+          state.Down = true;
+          break;
+        case SDLK_LEFT:
+          state.Left = true;
+          break;
+        case SDLK_RIGHT:
+          state.Right = true;
+          break;
+        case SDLK_x:
+          state.A = true;
+          break;
+        case SDLK_c:
+          state.B = true;
+          break;
+        case SDLK_BACKSPACE:
+          state.Game = true;
+          break;
+        case SDLK_RETURN:
+          state.Pause = true;
+          break;
+        case SDLK_RSHIFT:
+          state.Time = true;
+          break;
+        case SDLK_ESCAPE:
+          state.End = true;
+          break;
+        }
+      }
+    }
+    #endif
+    #ifdef GAMENWATCH
+    uint32_t buttons = get_buttons();
+    if (buttons & B_Up)
+      state.Up = true;
+    if (buttons & B_Down)
+      state.Down = true;
+    if (buttons & B_Left)
+      state.Left = true;
+    if (buttons & B_Right)
+      state.Right = true;
+    if (buttons & B_A)
+      state.A = true;
+    if (buttons & B_B)
+      state.B = true;
+    if (buttons & B_GAME)
+      state.Game = true;
+    if (buttons & B_PAUSE)
+      state.Pause = true;
+    if (buttons & B_TIME)
+      state.Time = true;
+    #endif
+    return state;
+  }
+};
+
 class Renderer {
   #ifdef DESKTOP
   SDL_Window* window;
@@ -311,7 +397,6 @@ protected:
     bool flipX, flipY;
     uint16_t spriteID;
     const char* tag = "None";
-    bool paused;
 public:
     Entity(float _x, float _y) {
         transform.x = _x;
@@ -319,7 +404,6 @@ public:
         spriteID = 0;
         flipX = false;
         flipY = false;
-        paused = false;
     }
 
     Transform* GetTransform() {
@@ -330,20 +414,12 @@ public:
         return tag;
     }
 
-    virtual void Events(uint32_t buttons) {
+    virtual void Events(KeyState buttons) {
         
     }
 
     virtual void Update(EntityManager* entityManager) {
 
-    }
-
-    virtual void Pause(){
-      paused = true;
-    }
-
-    virtual void Unpause(){
-      paused = false;
     }
 
     virtual void Draw(Renderer* renderer) {
@@ -375,7 +451,7 @@ public:
         return nullptr;
     }
 
-    void Events(uint32_t buttons) {
+    void Events(KeyState buttons) {
         for (auto entity : entities) {
             if (entity != nullptr) {
                 entity->Events(buttons);
@@ -399,22 +475,6 @@ public:
         }
     }
 
-    void Pause(){
-      for (auto entity : entities) {
-        if (entity != nullptr) {
-          entity->Pause();
-        }
-      }
-    }
-
-    void Unpause(){
-      for (auto entity : entities) {
-        if (entity != nullptr) {
-          entity->Unpause();
-        }
-      }
-    }
-
     Entity* GetEntity(int ID) {
         if (ID >= 0 && ID < MAX_ENTITIES) {
             return entities[ID];
@@ -425,69 +485,18 @@ public:
 };
 EntityManager* EntityManager::instance = nullptr;
 
-class Input{
-public:
-  static uint32_t GetButtons(){
-    #ifdef DESKTOP
-    SDL_Event event;
-    uint32_t buttons = 0;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_WINDOWEVENT){
-        if (event.window.event == SDL_WINDOWEVENT_CLOSE){
-          buttons |= (1<<31);
-        }
-      }
-      if (event.type == SDL_KEYDOWN) {
-        switch (event.key.keysym.sym) {
-        case SDLK_UP:
-          buttons |= B_Up;
-          break;
-        case SDLK_DOWN:
-          buttons |= B_Down;
-          break;
-        case SDLK_LEFT:
-          buttons |= B_Left;
-          break;
-        case SDLK_RIGHT:
-          buttons |= B_Right;
-          break;
-        case SDLK_x:
-          buttons |= B_A;
-          break;
-        case SDLK_c:
-          buttons |= B_B;
-          break;
-        case SDLK_BACKSPACE:
-          buttons |= B_GAME;
-          break;
-        case SDLK_RETURN:
-          buttons |= B_PAUSE;
-          break;
-        case SDLK_RSHIFT:
-          buttons |= B_TIME;
-          break;
-        }
-      }
-    }
-    return buttons;
-    #endif
-    #ifdef GAMENWATCH
-    return buttons_get();
-    #endif
-  }
-};
-
-class GameAndWatchEngine{
+class Engine{
 protected:
   Palette palette;
   Renderer* renderer;
   SpriteManager* spriteManager;
   EntityManager* entityManager;
 
-  bool running, paused;
+  bool running;
+  uint16_t backgroundColor;
 
 public:
-  GameAndWatchEngine(){
+  Engine(){
     uint16_t colors[16] = {0x0000, 0xFFFF, 0xFFFF, 0xFFFF, 
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
@@ -499,11 +508,12 @@ public:
 
     spriteManager = SpriteManager::GetInstance();
     entityManager = EntityManager::GetInstance();
+
+    backgroundColor = 0;
   }
 
   virtual void Start(){
     running = true;
-    paused = false;
     while (running)
     {
       Events();
@@ -516,18 +526,10 @@ public:
 
 protected:
   virtual void Events(){
-    uint32_t buttons = Input::GetButtons();
-    if (buttons&(1<<31)){
+    KeyState buttons = Input::GetButtons();
+    if (buttons.End){
       running = false;
     }
-
-    /*if ((buttons&B_PAUSE) && !paused){
-      entityManager->Pause();
-      paused = true;
-    }else if (!(buttons&B_PAUSE) && paused){
-      entityManager->Unpause();
-      paused = false;
-    }*/
 
     entityManager->Events(buttons);
   }
@@ -537,7 +539,7 @@ protected:
   }
 
   virtual void Draw(){
-    renderer->Clear(0);
+    renderer->Clear(backgroundColor);
     entityManager->Draw(renderer);
     renderer->Update();
   }
