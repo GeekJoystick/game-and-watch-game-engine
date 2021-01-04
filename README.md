@@ -1,8 +1,20 @@
-# G-W_Fire-Guy
+# Game&Watch Game Engine
 
-This is a game gone into a game engine project.
+So, basically, this is a game gone into a game engine project. \
+It's a game engine for the Game and Watch.
 
-Basically, it's a game engine for the Game and Watch.
+This engine is intended to be relatively easy to get started with (There are relatively few dependencies, listed below).
+There's a whole documentation just lower, and it should be fairly easy to understand.
+Do know that this engine can run on the Game&Watch, but also your desktop!
+Also as of now you can only compile your Game&Watch executable on a Linux-based distribution.
+If not, no worries, you can send me a message on discord (my username is Geek_Joystick#4238), or go on the [Game&Watch modding discord server](https://discord.gg/hcJjQW8SVY)
+
+## Dependencies
+#### Desktop:
+- [SDL2](https://www.libsdl.org/download-2.0.php)
+
+#### Game&Watch:
+- [gcc-arm-none-eabi](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 
 ## Compilation
 
