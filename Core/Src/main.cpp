@@ -10,55 +10,56 @@
 
 class Player: public Entity {
 protected:
-    float vx = 0;
-    float vy = 0;
+    Vector2 vel;
     float speed = 3;
 public:
     Player()
-        : Entity(0, 0)
+        : Entity({0, 0})
     {
         spriteID = 0;
+        transform.scale = 3;
         tag = "Player";
     }
     void Events(KeyState buttons) override{
          if (buttons.Up){
-           vy = -speed;
-           vx = 0;
+           vel.y = -speed;
+           vel.x = 0;
          }else if (buttons.Down){
-           vy = speed;
-           vx = 0;
+           vel.y = speed;
+           vel.x = 0;
          }else if (buttons.Left){
-           vx = -speed;
-           vy = 0;
+           vel.x = -speed;
+           vel.y = 0;
          }else if (buttons.Right){
-           vx = speed;
-           vy = 0;
+           vel.x = speed;
+           vel.y = 0;
          }
     }
 
     void Update(EntityManager* entityManager) override{
-      if (vx != 0 && vy != 0) {
-          vx = 0.707f * (vx / abs(vx));
-          vy = 0.707f * (vy / abs(vy));
+      if (vel.x != 0 && vel.y != 0) {
+          vel.x = 0.707f * (vel.x / abs(vel.x));
+          vel.y = 0.707f * (vel.y / abs(vel.y));
       }
-      if (vx < 0.0f) {
+      if (vel.x < 0.0f) {
           flipX = true;
       }
-      else if (vx > 0.0f) {
+      else if (vel.x > 0.0f) {
           flipX = false;
       }
 
-      transform.x += vx;
-      transform.y += vy;
+      transform.pos.x += vel.x;
+      transform.pos.y += vel.y;
     }
 };
 
 class Fuel : public Entity{
 public:
     Fuel()
-        : Entity(0, 0)
+        : Entity({0, 0})
     {
         spriteID = 1;
+        transform.scale = 3;
         tag = "Fuel";
     }
 
@@ -70,8 +71,8 @@ public:
           if (entity->Tag() == "Player"){
             Transform other = *entity->GetTransform();
             if (Math::RectCollision(transform, other)) {
-                transform.x = rand() % (int)(WIDTH - (transform.width*transform.scale));
-                transform.y = rand() % (int)(HEIGHT - (transform.height*transform.scale));
+                transform.pos.x = rand() % (int)(WIDTH - (transform.size.x*transform.scale));
+                transform.pos.y = rand() % (int)(HEIGHT - (transform.size.y*transform.scale));
             }
           }
         }
