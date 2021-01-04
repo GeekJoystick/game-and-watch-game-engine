@@ -66,6 +66,10 @@ public:
 
       #endif
     }
+    
+    /**
+     * Updates the window
+     */
     void Update() {
       #ifdef DESKTOP
       SDL_SetRenderTarget(sdl_renderer, NULL);
@@ -79,6 +83,10 @@ public:
       #endif
     }
 
+    /**
+     * Clears the windows with the given color index
+     * @param color Color byte
+     */
     void Clear(char color){
         uint16_t c = palette->GetColor(color);
         for (int y = 0; y < HEIGHT; y++){
@@ -88,6 +96,15 @@ public:
         }
     }
 
+    /**
+     * Draw a sprite on screen
+     * @param sprite Pointer to the sprite to be drawn
+     * @param x Horizontal position on screen
+     * @param y Vertical position on screen
+     * @param scale Scaling of the sprite (default: 1)
+     * @param flipX Horizontal flipping of the sprite (default: false)
+     * @param flipY Vertical flipping of the sprite (default: false)
+     */
     void DrawSprite(Sprite* sprite, int x, int y, int scale = 1, bool flipX = false, bool flipY = false, char transparentColor = 0) {
         if (palette == nullptr) {
           #ifdef DESKTOP
@@ -137,6 +154,10 @@ public:
         }
     }
     
+    /**
+     * Set the palette to the given palette pointer
+     * @param palette Pointer to the palette you want to set
+     */
     void SetPalette(Palette* _palette) {
       palette = _palette;
     }

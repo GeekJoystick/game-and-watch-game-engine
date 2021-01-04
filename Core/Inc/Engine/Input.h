@@ -1,9 +1,14 @@
 #ifndef INPUT_H
 #define INPUT_H
+#include "Defines.h"
 #include "KeyState.h"
 
 class Input{
 public:
+  /**
+   * Returns a KeyState object containing the
+   * current state of the buttons
+   */
   static KeyState GetButtons(){
     KeyState state;
     #ifdef DESKTOP

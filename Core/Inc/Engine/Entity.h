@@ -24,10 +24,16 @@ public:
         flipY = false;
     }
 
+    /**
+     * Returns a pointer to the Entity's Transform
+     */
     Transform* GetTransform() {
         return &transform;
     }
 
+    /**
+     * Returns a the Entity's tag
+     */
     const char* Tag() {
         return tag;
     }

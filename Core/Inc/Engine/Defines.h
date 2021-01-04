@@ -6,9 +6,10 @@
 //define GAMENWATCH
 #endif
 
-#define WIDTH 320
-#define HEIGHT 240
-#define MAX_SPRITES 256
+#define WIDTH        320
+#define HEIGHT       240
+#define MAX_SPRITES  256
+#define MAX_TILES    256
 #define MAX_ENTITIES 256
 
 #ifdef DESKTOP
@@ -58,7 +59,6 @@ static void MX_OCTOSPI1_Init(void);
 static void MX_SAI1_Init(void);
 static void MX_NVIC_Init(void);
 #endif
-
 #ifdef GAMENWATCH
 /**
   * @brief System Clock Configuration

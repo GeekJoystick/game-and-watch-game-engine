@@ -10,6 +10,11 @@ class EntityManager {
     int freeEntities = 0;
     uint16_t currentEntity;
 public:
+    /**
+     * Returns a singleton instance of the class. 
+     * Note: you can have other instances, but you can't
+     * access them through this method.
+     */
     static EntityManager* GetInstance() {
         if (instance == nullptr) {
             instance = new EntityManager();
@@ -17,12 +22,27 @@ public:
         return instance;
     }
 
+    /**
+     * Creates an entity at given slot
+     * Example syntax: CreateEntity<EntityClass>(0);
+     */
     template <class T>
     T* CreateEntity(uint16_t pos) {
         if (pos >= 0 && pos < MAX_ENTITIES) {
             T* entity = new T();
             entities[pos] = entity;
             return entity;
+        }
+        return nullptr;
+    }
+
+    /**
+     * Returns a pointer to the entity located in the given slot
+     * @param ID slot to get Entity from
+     */
+    Entity* GetEntity(int ID) {
+        if (ID >= 0 && ID < MAX_ENTITIES) {
+            return entities[ID];
         }
         return nullptr;
     }
@@ -49,13 +69,6 @@ public:
                 entity->Draw(ren);
             }
         }
-    }
-
-    Entity* GetEntity(int ID) {
-        if (ID >= 0 && ID < MAX_ENTITIES) {
-            return entities[ID];
-        }
-        return nullptr;
     }
 public:
 };
