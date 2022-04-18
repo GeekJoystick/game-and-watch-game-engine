@@ -56,7 +56,7 @@ public:
     }
     #endif
     #ifdef GAMENWATCH
-    uint32_t buttons = get_buttons();
+    uint32_t buttons = buttons_get();
     if (buttons & B_Up)
       state.Up = true;
     if (buttons & B_Down)
